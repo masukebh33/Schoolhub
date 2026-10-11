@@ -49,31 +49,3 @@ function chart(S){const c=$("#cv"),x=c.getContext("2d"),w=c.width=c.clientWidth*
 
 async function list(k){
  const [t,F]=P[k];ROWS=await api(k);
- $("#main").innerHTML=`<div class=bar><small>${ROWS.length} rekodi</small><div><input id=q placeholder="Tafuta..."> <button class=pri onclick="form('${k}')">+ Ongeza</button></div></div>
- <div class=card><table><thead><tr>${F.map(f=>`<th>${f[1]}`).join("")}<th></thead><tbody id=tb></tbody></table></div>`;
- const draw=q=>{const r=ROWS.filter(r=>Object.values(r).join(" ").toLowerCase().includes(q));
-  $("#tb").innerHTML=r.map(r=>`<tr>${F.map(f=>`<td>${Array.isArray(f[2])?`<span class="tag ${C[r[f[0]]]||""}">${esc(r[f[0]])}</span>`:esc(r[f[0]])}`).join("")}<td><button onclick="form('${k}',${r.id})">Hariri</button>${ME.role=="admin"?` <button class=del onclick="del('${k}',${r.id})">Futa</button>`:""}`).join("")||`<tr><td colspan=9 class=mut>Hakuna rekodi. Bofya "Ongeza" kuanza.`};
- draw("");$("#q").oninput=e=>draw(e.target.value.toLowerCase())}
-function form(k,id){const F=P[k][1],r=id?ROWS.find(x=>x.id==id):{};
- $("#modal").innerHTML=`<div class=box><h3>${id?"Hariri":"Ongeza"}: ${P[k][0]}</h3>${F.map(([n,l,o])=>`<label>${l}${Array.isArray(o)?`<select name=${n}>${o.map(v=>`<option ${r[n]==v?"selected":""}>${v}`).join("")}</select>`:`<input name=${n} type="${o||"text"}" value="${esc(r[n]||"")}">`}</label>`).join("")}
- <p id=me2 class=r></p><div class=bar><button onclick="closeM()">Ghairi</button><button class=pri onclick="save('${k}',${id||0})">Hifadhi</button></div></div>`;$("#modal").style.display="flex"}
-const closeM=()=>$("#modal").style.display="none";
-async function save(k,id){const d={};document.querySelectorAll("#modal [name]").forEach(e=>d[e.name]=e.value);
- try{await api(id?`${k}/${id}`:k,id?"PUT":"POST",d);closeM();go(k)}catch(e){$("#me2").textContent=e.message}}
-async function del(k,id){if(confirm("Una uhakika unataka kufuta?")){try{await api(`${k}/${id}`,"DELETE");go(k)}catch(e){alert(e.message)}}}
-
-function settings(){const a=ME.role=="admin";
- $("#main").innerHTML=`<div class=two><div class=card><h3>Badilisha nenosiri</h3><label>Nenosiri la zamani<input id=po type=password></label><label>Nenosiri jipya<input id=pn type=password></label><button class=pri onclick="pw()">Hifadhi</button><p id=m1></p></div>
- ${a?`<div><div class=card><h3>Jina la shule</h3><label><input id=sc value="${esc(ME.school)}"></label><button class=pri onclick="sch()">Hifadhi</button></div><br>
- <div class=card><h3>Ongeza mtumiaji</h3><label>Jina kamili<input id=un></label><label>Jina la kuingia<input id=uu></label><label>Nenosiri<input id=up type=password></label><label>Jukumu<select id=ur><option value=teacher>Mwalimu<option value=admin>Msimamizi</select></label><button class=pri onclick="usr()">Ongeza</button><p id=m2></p></div></div>`:""}</div>`}
-const say=(id,t,ok)=>{$(id).textContent=t;$(id).className=ok?"g":"r"};
-async function pw(){try{await api("password","POST",{old:$("#po").value,new:$("#pn").value});say("#m1","Nenosiri limebadilishwa",1)}catch(e){say("#m1",e.message)}}
-async function sch(){await api("settings","POST",{school_name:$("#sc").value});ME.school=$("#sc").value;$("#sn").textContent=ME.school}
-async function usr(){try{await api("users","POST",{name:$("#un").value,username:$("#uu").value,password:$("#up").value,role:$("#ur").value});say("#m2","Mtumiaji ameongezwa",1)}catch(e){say("#m2",e.message)}}
-
-$("#lf").onsubmit=async e=>{e.preventDefault();try{ME=await api("login","POST",Object.fromEntries(new FormData(e.target)));$("#err").textContent="";start()}catch(x){$("#err").textContent=x.message}};
-$("#lo").onclick=async()=>{await api("logout","POST").catch(()=>{});showLogin()};
-$("#mt").onclick=()=>$("#side").classList.toggle("open");
-$("#th").onclick=()=>{const d=document.documentElement;d.dataset.t=d.dataset.t=="dark"?"light":"dark";try{localStorage.t=d.dataset.t}catch{}};
-try{document.documentElement.dataset.t=localStorage.t||"dark"}catch{document.documentElement.dataset.t="dark"}
-boot();
